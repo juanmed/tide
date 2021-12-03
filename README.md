@@ -1,27 +1,10 @@
-# A General **T**oolbox for **I**dentifying Object **D**etection **E**rrors
-```
-████████╗██╗██████╗ ███████╗
-╚══██╔══╝██║██╔══██╗██╔════╝
-   ██║   ██║██║  ██║█████╗  
-   ██║   ██║██║  ██║██╔══╝  
-   ██║   ██║██████╔╝███████╗
-   ╚═╝   ╚═╝╚═════╝ ╚══════╝
-```
+# Modified TIDE
 
-An easy-to-use, general toolbox to compute and evaluate the effect of object detection and instance segmentation on overall performance. This is the code for our paper: [TIDE: A General Toolbox for Identifying Object Detection Errors](https://dbolya.github.io/tide/paper.pdf) ([ArXiv](https://arxiv.org/abs/2008.08115)) [ECCV2020 Spotlight].
-
-Check out our ECCV 2020 short video for an explanation of what TIDE can do:
-
-[![TIDE Introduction](https://img.youtube.com/vi/McYFYU3PXcU/0.jpg)](https://youtu.be/McYFYU3PXcU)
-
-# Installation
-
-TIDE is available as a python package for python 3.6+ as [tidecv](https://pypi.org/project/tidecv/). To install, simply install it with pip:
+## Installation
 ```shell
-pip3 install tidecv
+pip install git+https://github.com/Swall0w/tide
 ```
 
-The current version is v1.0.1 ([changelog](https://github.com/dbolya/tide/blob/master/CHANGELOG.md)).
 
 # Usage
 TIDE is meant as a drop-in replacement for the [COCO Evaluation toolkit](https://github.com/cocodataset/cocoapi), and getting started is easy:
