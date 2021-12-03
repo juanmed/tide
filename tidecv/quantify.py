@@ -698,7 +698,10 @@ class TIDE:
             cm = np.zeros((n_classes, n_classes), dtype=np.int32)
             for error in run.errors:
                 if isinstance(error, ClassError):
-                    cm[error.pred['class']-1][error.gt['class']-1] += 1
+                    try:
+                        cm[error.pred['class']-1][error.gt['class']-1] += 1
+                    except:
+                        pass
             confusion_matrix[run_name] = cm
             sorted_keys = sorted(run.gt.classes.keys())
             print()
