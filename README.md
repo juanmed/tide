@@ -5,6 +5,7 @@
 pip install git+https://github.com/Swall0w/tide
 ```
 
+![Confusion Matrix](examples/coco_result.png)
 
 # Usage
 TIDE is meant as a drop-in replacement for the [COCO Evaluation toolkit](https://github.com/cocodataset/cocoapi), and getting started is easy:
