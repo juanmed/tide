@@ -25,6 +25,7 @@ def main():
     #tide.evaluate(datasets.COCO(), datasets.COCOResult('path/to/your/results/file'), mode=TIDE.BOX) # Use TIDE.MASK for masks
     tide.evaluate(gt, bbox_results, mode=TIDE.BOX, name=args.name) # Use TIDE.MASK for masks
     tide.summarize()  # Summarize the results as tables in the console
+    tide.plot('./result') 
 
 
     ret = tide.get_confusion_matrix()
