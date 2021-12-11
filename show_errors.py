@@ -23,26 +23,28 @@ def main():
     gt = datasets.COCO(args.annotation)
     bbox_results = datasets.COCOResult(args.result)
     #tide.evaluate(datasets.COCO(), datasets.COCOResult('path/to/your/results/file'), mode=TIDE.BOX) # Use TIDE.MASK for masks
-    tide.evaluate(gt, bbox_results, mode=TIDE.BOX, name=args.name) # Use TIDE.MASK for masks
+    run = tide.evaluate(gt, bbox_results, mode=TIDE.BOX, name=args.name) # Use TIDE.MASK for masks
     tide.summarize()  # Summarize the results as tables in the console
     tide.plot('./result') 
 
+    for class_id, ap_data in run.ap_data.objs.items():
+        print('{:10s}: {:.2f}'.format(str(class_id), ap_data.get_ap()))
 
-    ret = tide.get_confusion_matrix()
-    cm = pd.DataFrame(data=ret[''].T, 
-                      index=gt.classes.values(),
-                      columns=gt.classes.values())
-    sns.set(font_scale=0.4)
-    fig, axes = plt.subplots(figsize=(10,8))
-    sns.heatmap(cm, square=True, cbar=True, annot=False, cmap='Blues',
-            xticklabels=True, yticklabels=True,
-            linewidths=.5
-            )
-    plt.xlabel("Predict", fontsize=13)
-    plt.ylabel("GT", fontsize=13)
-    fig.subplots_adjust(bottom=0.15)
-    plt.savefig('class_error_confusion_matrix.png')
-    #tide.plot() 
+
+#    ret = tide.get_confusion_matrix()
+#    cm = pd.DataFrame(data=ret[''].T, 
+#                      index=gt.classes.values(),
+#                      columns=gt.classes.values())
+#    sns.set(font_scale=0.4)
+#    fig, axes = plt.subplots(figsize=(10,8))
+#    sns.heatmap(cm, square=True, cbar=True, annot=False, cmap='Blues',
+#            xticklabels=True, yticklabels=True,
+#            linewidths=.5
+#            )
+#    plt.xlabel("Predict", fontsize=13)
+#    plt.ylabel("GT", fontsize=13)
+#    fig.subplots_adjust(bottom=0.15)
+#    plt.savefig('class_error_confusion_matrix.png')
 
 
 if __name__ == '__main__':
