@@ -53,9 +53,70 @@ def download_annotations(name:str, url:str, force_download:bool=False) -> str:
         print('Successfully downloaded {} to "{}"'.format(name, candidate_path))
         return candidate_path
 
+def Unloading(path:str=None, name:str=None, year:int=2017, ann_set:str='val', force_download:bool=False, max_dets=200) -> Data:
+    """
+    Loads ground truth from a COCO-style annotation file.
+    
+    If path is not specified, this will download the COCO annotations for the year and ann_set specified.
+    Valid years are 2014, 2017 and valid ann_sets are 'val' and 'train'.
+    """
+    if path is None:
+        print("Path to .json annotation file is required. Set it with -path- parameter.")
+        raise Exception("Missing parameter.")
+    
+    if name is None: name = default_name(path)
+    
+    with open(path, 'r') as json_file:
+        cocojson = json.load(json_file)
+    
+    images = cocojson['images']
+    anns   = cocojson['annotations']
+    cats   = cocojson['categories'] if 'categories' in cocojson else None
 
 
+    # Add everything from the coco json into our data structure
+    data = Data(name, max_dets=max_dets)
 
+    image_lookup = {}
+
+    for idx, image in enumerate(images):
+        image_lookup[image['id']] = image
+        data.add_image(image['id'], image['file_name'])
+
+    if cats is not None:
+        for cat in cats:
+            data.add_class(cat['id'], cat['name'])
+
+    for ann in anns:
+        image  = ann['image_id']
+        _class = ann['category_id']
+        box    = ann['bbox']
+        mask   = f.toRLE(ann['segmentation'], image_lookup[image]['width'], image_lookup[image]['height'])
+        
+        if ann['iscrowd']: data.add_ignore_region(image, _class, box, mask)
+        else:              data.add_ground_truth (image, _class, box, mask)
+    
+    return data
+
+def UnloadingResult(path:str, name:str=None, max_dets=max_dets) -> Data:
+    """ Loads predictions from a COCO-style results file. """
+    if name is None: name = default_name(path)
+    
+    with open(path, 'r') as json_file:
+        dets = json.load(json_file)
+
+    data = Data(name, max_dets=max_dets)
+
+    for det in dets:
+        image = det['image_id']
+        _cls  = det['category_id']
+        score = det['score']
+        box   = det['bbox']         if 'bbox'         in det else None
+        mask  = det['segmentation'] if 'segmentation' in det else None
+
+        data.add_detection(image, _cls, score, box, mask)
+    
+    return data
 
 def COCO(path:str=None, name:str=None, year:int=2017, ann_set:str='val', force_download:bool=False) -> Data:
     """
