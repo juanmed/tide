@@ -218,7 +218,6 @@ class TIDERun:
         preds = ex.preds # In case the number of predictions was restricted to the max
 
         for pred_idx, pred in enumerate(preds):
-
             pred['info'] = {'iou': pred['iou'], 'used': pred['used']}
             if pred['used']: pred['info']['matched_with'] = pred['matched_with']
             
@@ -714,4 +713,34 @@ class TIDE:
 
         return confusion_matrix
 
+    def get_full_confusion_matrix(self,run):
+        confusion_matrix = {}
+        n_classes = len(run.gt.classes)
+        #row: predicted classes, col: actual classes
+        cm = np.zeros((n_classes, n_classes), dtype=np.int32)
 
+        for image in run.gt.images:
+            x = run.preds.get(image)
+            y = run.gt.get(image)  
+            print(len(x),type(x),x[0].keys()) 
+
+            for pred in x:
+                match_id = pred['matched_with'] 
+                gt = y[match_id]
+                try:
+                    cm[pred['class']-1][gt['class']-1] += 1
+                except:
+                    pass                      
+
+
+        confusion_matrix[run_name] = cm
+        sorted_keys = sorted(run.gt.classes.keys())
+        print()
+
+        P.print_table([
+            ['pred/gt'] + [run.gt.classes[k] for k in sorted_keys],
+        ] + [
+            [run.gt.classes[k]] + [str(cnt) for cnt in cm[i]] for i, k in enumerate(sorted_keys)
+        ], title=f"{run_name} full confusion matrix")
+
+        return confusion_matrix

@@ -98,7 +98,7 @@ def Unloading(path:str=None, name:str=None, year:int=2017, ann_set:str='val', fo
     
     return data
 
-def UnloadingResult(path:str, name:str=None, max_dets=max_dets) -> Data:
+def UnloadingResult(path:str, name:str=None, max_dets=200) -> Data:
     """ Loads predictions from a COCO-style results file. """
     if name is None: name = default_name(path)
     

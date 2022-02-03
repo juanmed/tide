@@ -23,10 +23,10 @@ def main():
     args = arg()
 
     tide = TIDE()
-    gt = datasets.COCO(args.annotation)
-    bbox_results = datasets.COCOResult(args.result)
+    gt = datasets.Unloading(args.annotation)
+    bbox_results = datasets.UnloadingResult(args.result)
     #tide.evaluate(datasets.COCO(), datasets.COCOResult('path/to/your/results/file'), mode=TIDE.BOX) # Use TIDE.MASK for masks
-    run = tide.evaluate(gt, bbox_results, mode=TIDE.BOX, name=args.name) # Use TIDE.MASK for masks
+    run = tide.evaluate(gt, bbox_results, mode=TIDE.MASK, name=args.name) # Use TIDE.MASK for masks
     tide.summarize()
     tide.plot('./result') 
 
@@ -83,6 +83,47 @@ def main():
     fig.subplots_adjust(bottom=0.15)
     plt.savefig('class_error_confusion_matrix.png')
 
+    preds = []
+    gts = []
+    for image in run.gt.images:
+        preds.append(run.preds.get(image).copy())
+        gts.append(run.gt.get(image).copy())
+ 
+
+    confusion_matrix = {}
+    n_classes = len(run.gt.classes)
+    #row: predicted classes, col: actual classes
+    cm = np.zeros((n_classes, n_classes), dtype=np.int32)
+    for x,y in zip(preds,gts):
+        x = run.preds.get(image)
+        y = run.gt.get(image) 
+        #print(x[0].keys())
+        for pred in x:
+            match_id = pred['matched_with'] 
+            
+            try:
+                gt = y[match_id]
+                cm[pred['class']-1][gt['class']-1] += 1
+            except:
+                pass  
+    confusion_matrix[''] = cm
+    dat = confusion_matrix[''].T
+
+    if args.normalize:
+        dat = dat / dat.astype(np.float).sum(axis=0)
+    cm = pd.DataFrame(data=dat,
+                      index=gt.classes.values(),
+                      columns=gt.classes.values())
+    sns.set(font_scale=0.4)
+    fig, axes = plt.subplots(figsize=(10,8))
+    sns.heatmap(cm, square=True, cbar=True, annot=False, cmap='Blues',
+            xticklabels=True, yticklabels=True,
+            linewidths=.5
+            )
+    plt.xlabel("Predict", fontsize=13)
+    plt.ylabel("GT", fontsize=13)
+    fig.subplots_adjust(bottom=0.15)
+    plt.savefig('full_confusion_matrix.png')
 
 if __name__ == '__main__':
     main()
